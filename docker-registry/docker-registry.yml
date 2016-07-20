@@ -1,0 +1,29 @@
+---
+- hosts: docker-registry
+  roles:
+  vars:
+    version: 1.0
+  remote_user: vagrant
+  become: yes
+  become_user: root
+  tasks:
+    - name: install docker yum repository
+      yum_repository:
+        name: "Docker Registry"
+        baseurl: https://yum.dockerproject.org/repo/main/centos/7/
+        description: "docker registry"
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://yum.dockerproject.org/gpg
+    
+    - name: install docker
+      yum: name=docker state=present
+    
+    - name: start docker service
+      service: 
+        name: "docker.service" 
+        state: started
+        enabled: yes
+    
+    - name: start docker registry container
+      command: docker run --name cecdat-docker-registry -d -p 5000:5000 registry
