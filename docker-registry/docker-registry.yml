@@ -26,13 +26,13 @@
         enabled: yes
     
     - name: copy certs
-      copy: src=./certs dest=/root/
+      copy: src=../certs dest=/root/
 
     - name: Creates directory
       file: path=/etc/docker/certs.d/registry.cecdat.com:5000 state=directory
 
     - name: copy certs to registry.cecdat.com:5000/ca.crt
-      copy: src=./certs/domain.crt dest=/etc/docker/certs.d/registry.cecdat.com:5000/ca.crt
+      copy: src=../certs/domain.crt dest=/etc/docker/certs.d/registry.cecdat.com:5000/ca.crt
 
     - name: change SELinux settings to authorize containers to access certs
       command: chcon -Rt svirt_sandbox_file_t /root/certs
