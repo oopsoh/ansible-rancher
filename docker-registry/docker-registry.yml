@@ -34,8 +34,11 @@
     - name: copy certs to registry.cecdat.com:5000/ca.crt
       copy: src=../certs/domain.crt dest=/etc/docker/certs.d/registry.cecdat.com:5000/ca.crt
 
+    - name: add host for registry.cecdat.com
+      lineinfile: dest=/etc/hosts regexp='registry.cecdat.com' line='{{ registry_host }} registry.cecdat.com' owner=root group=root mode=0644
+
     - name: change SELinux settings to authorize containers to access certs
       command: chcon -Rt svirt_sandbox_file_t /root/certs
-    
+
     - name: start docker registry container
       command: docker run --name cecdat-docker-registry --restart=always -d -p 5000:5000 -v /root/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2

@@ -1,0 +1,28 @@
+---
+  # file: roles/docker/tasks/main.yml
+  - name: install docker yum repository
+    yum_repository:
+      name: "Docker Registry"
+      baseurl: https://yum.dockerproject.org/repo/main/centos/7/
+      description: "docker registry"
+      enabled: yes
+      gpgcheck: yes
+      gpgkey: https://yum.dockerproject.org/gpg
+  
+  - name: install docker
+    yum: name=docker state=present
+  
+  - name: start docker service
+    service: 
+      name: "docker.service" 
+      state: started
+      enabled: yes
+
+  - name: Creates directory
+    file: path=/etc/docker/certs.d/registry.cecdat.com:5000 state=directory
+
+  - name: copy certs to registry.cecdat.com:5000/ca.crt
+    copy: src=../certs/domain.crt dest=/etc/docker/certs.d/registry.cecdat.com:5000/ca.crt
+
+  - name: add host for registry.cecdat.com
+    lineinfile: dest=/etc/hosts regexp='registry.cecdat.com' line='{{ registry_host }} registry.cecdat.com' owner=root group=root mode=0644

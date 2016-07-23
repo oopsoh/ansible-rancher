@@ -1,0 +1,12 @@
+---
+- hosts: rancher-servers
+  roles:
+    - docker
+  vars:
+    version: 1.0
+  remote_user: vagrant
+  become: yes
+  become_user: root
+  tasks:
+    - name: run rancher server container
+      command: docker run --name rancher-server -d -p 5000:5000 -t -i 192.168.99.10:5000/rancher/server

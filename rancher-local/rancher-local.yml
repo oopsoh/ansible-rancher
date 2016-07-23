@@ -1,0 +1,9 @@
+---
+- hosts: rancher-hosts
+  roles:
+    - docker
+  vars:
+    version: 1.0
+  remote_user: vagrant
+  become: yes
+  become_user: root
