@@ -25,5 +25,17 @@
         state: started
         enabled: yes
     
+    - name: copy certs
+      copy: src=./certs dest=/root/
+
+    - name: Creates directory
+      file: path=/etc/docker/certs.d/registry.cecdat.com:5000 state=directory
+
+    - name: copy certs to registry.cecdat.com:5000/ca.crt
+      copy: src=./certs/domain.crt dest=/etc/docker/certs.d/registry.cecdat.com:5000/ca.crt
+
+    - name: change SELinux settings to authorize containers to access certs
+      command: chcon -Rt svirt_sandbox_file_t /root/certs
+    
     - name: start docker registry container
-      command: docker run --name cecdat-docker-registry -d -p 5000:5000 registry
+      command: docker run --name cecdat-docker-registry --restart=always -d -p 5000:5000 -v /root/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2
