@@ -20,6 +20,5 @@
         privileged: yes
         command: http://{{ rancher_server_host }}:{{ rancher_server_port }}/v1/scripts/{{ rancher_server_registration_token }}
         image: registry.cecdat.com:5000/rancher/agent:v1.0.2
-        restart_policy: always
         env:
-          CATTLE_AGENT_IP: '{{ ansible_ssh_host }}'
+          CATTLE_AGENT_IP: '{{ ansible_host }}'
