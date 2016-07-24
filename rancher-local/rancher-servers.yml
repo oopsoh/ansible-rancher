@@ -9,4 +9,9 @@
   become_user: root
   tasks:
     - name: run rancher server container
-      command: docker run --name rancher-server -d -p 5000:5000 -t -i 192.168.99.10:5000/rancher/server
+      docker: 
+        name: rancher_server
+        image: registry.cecdat.com:5000/rancher/server
+        ports: 
+          - "8080:8080"
+        restart_policy: always

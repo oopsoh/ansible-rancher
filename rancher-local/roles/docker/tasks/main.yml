@@ -1,5 +1,14 @@
 ---
   # file: roles/docker/tasks/main.yml
+  - name: install python-setuptools
+    yum: name=python-setuptools state=present
+
+  - name: easy_install pip
+    easy_install: name=pip state=present
+
+  - name: pip install docker-py
+    pip: name=docker-py
+
   - name: install docker yum repository
     yum_repository:
       name: "Docker Registry"

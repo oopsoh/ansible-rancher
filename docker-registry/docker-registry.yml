@@ -7,6 +7,15 @@
   become: yes
   become_user: root
   tasks:
+    - name: install python-setuptools
+      yum: name=python-setuptools state=present
+
+    - name: easy_install pip
+      easy_install: name=pip state=present
+
+    - name: pip install docker-py
+      pip: name=docker-py
+
     - name: install docker yum repository
       yum_repository:
         name: "Docker Registry"
@@ -41,4 +50,14 @@
       command: chcon -Rt svirt_sandbox_file_t /root/certs
 
     - name: start docker registry container
-      command: docker run --name cecdat-docker-registry --restart=always -d -p 5000:5000 -v /root/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2
+      docker: 
+        name: cecdat-docker-registry
+        image: registry:2
+        ports:
+          - "5000:5000"
+        restart_policy: always
+        env:
+          REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.crt
+          REGISTRY_HTTP_TLS_KEY: /certs/domain.key
+        volumes:
+          - /root/certs:/certs

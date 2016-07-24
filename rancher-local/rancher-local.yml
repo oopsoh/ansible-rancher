@@ -7,3 +7,19 @@
   remote_user: vagrant
   become: yes
   become_user: root
+  tasks:
+    - name: wait for rancher server started
+      wait_for: host={{ rancher_server_host }} port={{ rancher_server_port }} delay=1 state=drained
+
+    - name: add host to rancher server
+      docker:
+        name: rancher_agent_container
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - /var/lib/rancher:/var/lib/rancher
+        privileged: yes
+        command: http://{{ rancher_server_host }}:{{ rancher_server_port }}/v1/scripts/{{ rancher_server_registration_token }}
+        image: registry.cecdat.com:5000/rancher/agent:v1.0.2
+        restart_policy: always
+        env:
+          CATTLE_AGENT_IP: '{{ ansible_ssh_host }}'
