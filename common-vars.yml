@@ -1,4 +1,4 @@
-registry_host: 192.168.99.10
+registry_host: 192.168.101.101
 rancher_server_host: 192.168.99.20
 rancher_server_port: 8080
-rancher_server_registration_token: B215494F68A9ABAD4A47:1469361600000:90rtdjMAfbtZuBDhUEv4hTKeXBU
+rancher_server_registration_token: 096B3B914EFA31DA0E6B:1469415600000:2mE41xVzJewtV5sXJAQqAmvn61s
