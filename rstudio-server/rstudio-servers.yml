@@ -1,0 +1,20 @@
+---
+- hosts: rstudio-servers
+  roles:
+  vars:
+    version: 1.0
+  remote_user: vagrant
+  become: yes
+  become_user: root
+  tasks:
+    - name: yum install epel-release
+      yum: name=epel-release
+
+    - name: yum install R
+      yum: name=R
+
+    - name: yum install rstudio server
+      yum: name=https://download2.rstudio.org/rstudio-server-rhel-pro-0.99.903-x86_64.rpm
+
+    - name: check rstudio server
+      command: rstudio-server verify-installation
