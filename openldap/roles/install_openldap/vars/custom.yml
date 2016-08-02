@@ -1,0 +1,8 @@
+---
+
+#dc=cecdat,dc=com then cecdat.com
+olcSuffix_berfoce_dc: cecdat
+olcSuffix_after_dc: com
+olcRootDN_cn: Manager
+olcRootPW: cecdata@123
+schema_path: /etc/openldap/schema

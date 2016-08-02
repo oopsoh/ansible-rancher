@@ -1,0 +1,35 @@
+#this is a  a real deployment there's a generated file with real IPs
+
+[cdh-worker]
+dev3 ansible_ssh_host=10.12.12.2
+dev4 ansible_ssh_host=10.12.12.14
+dev5 ansible_ssh_host=10.12.12.20
+
+[cdh-manager]
+manager ansible_ssh_host=10.12.12.21
+
+[cdh-master]
+dev1 ansible_ssh_host=10.12.12.18
+dev2 ansible_ssh_host=10.12.12.19
+
+[openldap]
+ldap ansible_ssh_host=10.12.12.10
+
+[cdh-all-nodes:children]
+cdh-master
+cdh-worker
+
+[cdh-all:children]
+cdh-all-nodes
+cdh-manager
+
+[manager]
+manager
+
+[all:children]
+cdh-all
+openldap
+
+
+
+

@@ -1,0 +1,77 @@
+#installs all of the dependencies required by both the openldap server and other stages
+- name: install openldap
+  yum: name={{ item }} state=present
+  with_items:
+    - openldap
+    - openldap-clients
+    - openldap-servers
+    - migrationtools
+
+ #config openldap server
+- name: config file /etc/openldap/slapd.d/cn=config/olcDatabase={2}hdb.ldif
+  lineinfile: 'dest=/etc/openldap/slapd.d/cn=config/olcDatabase={2}hdb.ldif regexp="^olcSuffix:" line="olcSuffix: dc={{ olcSuffix_berfoce_dc }},dc={{ olcSuffix_after_dc}}"'
+
+- name: config file /etc/openldap/slapd.d/cn=config/olcDatabase={2}hdb.ldif
+  lineinfile: "dest=/etc/openldap/slapd.d/cn=config/olcDatabase={2}hdb.ldif regexp='^olcRootDN' line='olcRootDN: cn={{ olcRootDN_cn }},dc={{ olcSuffix_berfoce_dc }},dc={{ olcSuffix_after_dc}}'"
+ 
+- name: add olcRootPW to the file
+  lineinfile: 'dest=/etc/openldap/slapd.d/cn=config/olcDatabase={2}hdb.ldif line="olcRootPW: {{ olcRootPW }}" backup=yes'
+
+#config monitor database 
+- name: config file  /etc/openldap/slapd.d/cn=config/olcDatabase={1}monitor.ldif
+  lineinfile:  'dest=/etc/openldap/slapd.d/cn=config/olcDatabase={1}monitor.ldif regexp="^olcAccess" line="olcAccess: {0}to * by dn.base="gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth" read by dn.base="cn={{olcRootDN_cn}},dc={{olcSuffix_berfoce_dc}},dc={{olcSuffix_after_dc}}" read by * none" backup=yes'
+- name: delete other line
+  lineinfile:  'dest=/etc/openldap/slapd.d/cn=config/olcDatabase={1}monitor.ldif regexp="^ al,cn=auth" state=absent'
+
+#prepare the ldap database
+- name: copy DB_CONFIG.example
+  copy: src=DB_CONFIG.example dest=/var/lib/ldap/DB_CONFIG owner=ldap group=ldap mode=0644
+
+#test congfig
+- name: test config
+  shell: slaptest -u
+  args:
+    executable: /bin/bash
+  register: shell_result
+ 
+- name: success or fail  
+  fail: msg="the config for openldap errored"
+  when: shell_result.rc != 0 and not shell_result.stdout
+
+ #start and enable the slapd service at boot
+- name: Name for this sentence.
+  service: name=slapd state=started enabled=yes
+ 
+ #check slapd service active by ip:port
+- name: test port
+  shell: netstat -anp | grep 389
+  args:
+    executable: /bin/bash
+  register: shell_result
+
+- name: port active
+  fail: msg="the config for openldap errored"
+  when:  shell_result.rc != 0 and not shell_result.stdout | search('(error)|(fail)')
+
+- easy_install: name=pexpect state=latest   
+
+ #add ldap schemas
+- name: add ldap schemas
+  expect: 
+    command: 'ldapadd -Y EXTERNAL -H ldapi:/// -D "cn=config" -f {{ item }}'
+    responses:
+      Enter LDAP Password: "{{ olcRootPW }}"
+  with_items:
+    - "{{ schema_path }}/cosine.ldif"
+    - "{{ schema_path }}/nis.ldif"
+    - "{{ schema_path }}/collective.ldif"
+    - "{{ schema_path }}/corba.ldif"
+    - "{{ schema_path }}/duaconf.ldif"
+    - "{{ schema_path }}/dyngroup.ldif"
+    - "{{ schema_path }}/inetorgperson.ldif"
+    - "{{ schema_path }}/java.ldif"
+    - "{{ schema_path }}/misc.ldif"
+    - "{{ schema_path }}/openldap.ldif"
+    - "{{ schema_path }}/pmi.ldif"
+    - "{{ schema_path }}/ppolicy.ldif"
+

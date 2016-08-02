@@ -1,0 +1,21 @@
+---
+
+- name: install phpldapadmin and php env
+  yum: name={{ item }} state=present
+  with_items:
+    - phpldapadmin
+    - php
+    - php-ldap
+    - php-xml
+    - php-mbstring
+    - php-bcmath
+    - php-gd
+
+- name: open apache phpldapadmin access
+  lineinfile: 'dest=/etc/httpd/conf.d/phpldapadmin.conf regexp="^Require local" line="Require all granted"'
+
+- name: copy phpldapadmin config file
+  copy: src=config.php dest=/usr/share/phpldapadmin/config/config.php owner=root group=apache mode=0640
+
+  notify:
+    - restart httpd

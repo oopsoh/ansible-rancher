@@ -1,0 +1,1 @@
+ansible-playbook /home/ansible/ansible-openldap/site.yml -v -i /home/ansible/ansible-openldap/inventory/ansible_hosts -e @../roles/install_openldap/vars/custom.yml
