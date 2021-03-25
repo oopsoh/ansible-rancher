@@ -12,7 +12,7 @@ paramiko==2.0.1
 pyasn1==0.1.9
 pycparser==2.14
 pycrypto==2.6.1
-PyYAML==3.11
+PyYAML==5.4
 requests==2.10.0
 six==1.10.0
 websocket-client==0.37.0
